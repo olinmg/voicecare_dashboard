@@ -40,7 +40,7 @@ const ElderlyCareHome: React.FC = () => {
         </div>
 
         {/* Dashboard Content - Fixed height container with scrollability */}
-        <div className="h-[800px] overflow-y-auto">
+        <div className="h-[500px]">
           {activeTab === 'demo' ? (
             <div className="flex flex-col items-center justify-center py-4">
               <div className="max-w-xs mx-auto text-center mb-4">
