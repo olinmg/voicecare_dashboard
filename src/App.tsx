@@ -8,6 +8,7 @@ import VisionPage from './components/VisionPage';
 import ToolsPage from './components/ToolsPage';
 import ProductsPage from './components/ProductsPage';
 import ScrollToTop from './components/ScrollToTop';
+import ElderlyCareHome from './components/elderly-care/ElderlyCareHome';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/voicecare" element={<VoiceCare />} />
             <Route path="/tools" element={<ToolsPage />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/elderly-care" element={<ElderlyCareHome />} />
           </Routes>
           <Footer />
         </div>
