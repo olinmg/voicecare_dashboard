@@ -55,6 +55,9 @@ interface CaretakerDashboardProps {
       tired: number;
       dizzy: number;
     };
+    gender: string;
+    healthScore?: number;
+    historicalHealthScores?: number[];
   }>;
   alerts: Array<{
     type: 'high' | 'medium' | 'low';
@@ -150,6 +153,71 @@ const CaretakerDashboard: React.FC<CaretakerDashboardProps> = ({
           trend={metrics.activeAlerts > 0 ? 'up' : 'down'}
           percentChange={metrics.activeAlerts > 0 ? 15 : -15}
         />
+      </div>
+      
+      {/* Residents Feeling Summary */}
+      <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">How Your Residents Are Feeling Today</h3>
+        <p className="text-gray-700 leading-relaxed mb-4">
+          {criticalResidents.length > 0 ? (
+            <>
+              {criticalResidents.length === 1 ? (
+                <span className="font-medium text-red-700">{criticalResidents[0].name}</span>
+              ) : (
+                <>
+                  <span className="font-medium text-red-700">
+                    {criticalResidents.map((r, i) => (
+                      i === criticalResidents.length - 1 
+                        ? ` and ${r.name}` 
+                        : `${i === 0 ? '' : ', '}${r.name}`
+                    ))}
+                  </span>
+                </>
+              )} 
+              {criticalResidents.length === 1 
+                ? ` is feeling unwell today, with a concerning mood score of ${criticalResidents[0].moodScore?.toFixed(1)}/10. `
+                : ` are feeling unwell today, with concerning mood scores. `
+              }
+              These residents require your immediate attention.
+            </>
+          ) : ''}
+          
+          {attentionResidents.length > 0 && (
+            <>
+              {criticalResidents.length > 0 && ' '}
+              {attentionResidents.length === 1 ? (
+                <span className="font-medium text-yellow-700">{attentionResidents[0].name}</span>
+              ) : (
+                <>
+                  <span className="font-medium text-yellow-700">
+                    {attentionResidents.map((r, i) => (
+                      i === attentionResidents.length - 1 
+                        ? ` and ${r.name}` 
+                        : `${i === 0 ? '' : ', '}${r.name}`
+                    ))}
+                  </span>
+                </>
+              )}
+              {attentionResidents.length === 1 
+                ? ` is showing signs of concern with a mood score of ${attentionResidents[0].moodScore?.toFixed(1)}/10. `
+                : ` are showing signs of concern with lower mood scores. `
+              }
+              Consider checking in with {attentionResidents.length === 1 ? 'them' : 'these residents'} today.
+            </>
+          )}
+          
+          {criticalResidents.length === 0 && attentionResidents.length === 0 && 
+            `All residents appear to be feeling well today, with an average mood score of ${metrics.avgMoodScore.toFixed(1)}/10.
+            No residents currently require immediate attention.`
+          }
+        </p>
+        
+        <div className="text-sm text-gray-500">
+          <span className="font-medium">Keywords mentioned today: </span>
+          Pain ({patients.reduce((sum, p) => sum + (p.keywordFrequency?.pain || 0), 0)} times), 
+          Tired ({patients.reduce((sum, p) => sum + (p.keywordFrequency?.tired || 0), 0)} times), 
+          Dizzy ({patients.reduce((sum, p) => sum + (p.keywordFrequency?.dizzy || 0), 0)} times)
+        </div>
       </div>
 
       {/* Critical Residents Alert Banner */}
@@ -270,7 +338,10 @@ const CaretakerDashboard: React.FC<CaretakerDashboardProps> = ({
               type={alert.type}
               message={alert.message}
               timestamp={alert.timestamp}
-              patientName={alert.patientName}
+              ResidentName={alert.patientName}
+              category={alert.category}
+              details={alert.details}
+              recommendedAction={alert.recommendedAction}
             />
           ))}
         </div>

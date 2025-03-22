@@ -1,6 +1,6 @@
 import React from 'react';
 
-type Tab = 'demo' | 'manager' | 'caretaker';
+type Tab = 'demo' | 'manager' | 'caretaker' | 'residents';
 
 interface TabItem {
   id: Tab;

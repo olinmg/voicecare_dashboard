@@ -309,7 +309,8 @@ export const patients = [
       dizzy: 0
     },
     // Weekly mood scores trending up
-    historicalMoodScores: [7.5, 7.7, 7.8, 8.0, 8.1, 8.2]
+    historicalMoodScores: [7.5, 7.7, 7.8, 8.0, 8.1, 8.2],
+    gender: "female"
   },
   {
     id: "P002",
@@ -333,7 +334,8 @@ export const patients = [
       dizzy: 2
     },
     // Weekly mood scores declining
-    historicalMoodScores: [6.2, 6.0, 5.9, 5.7, 5.5, 5.4]
+    historicalMoodScores: [6.2, 6.0, 5.9, 5.7, 5.5, 5.4],
+    gender: "male"
   },
   {
     id: "P003",
@@ -357,7 +359,8 @@ export const patients = [
       dizzy: 0
     },
     // Weekly mood scores consistently high
-    historicalMoodScores: [8.5, 8.6, 8.5, 8.7, 8.6, 8.7]
+    historicalMoodScores: [8.5, 8.6, 8.5, 8.7, 8.6, 8.7],
+    gender: "female"
   },
   {
     id: "P004",
@@ -381,7 +384,8 @@ export const patients = [
       dizzy: 3
     },
     // Weekly mood scores severely declining
-    historicalMoodScores: [5.5, 5.2, 4.9, 4.6, 4.4, 4.2]
+    historicalMoodScores: [5.5, 5.2, 4.9, 4.6, 4.4, 4.2],
+    gender: "male"
   },
   {
     id: "P005",
@@ -405,7 +409,8 @@ export const patients = [
       dizzy: 1
     },
     // Weekly mood scores fluctuating but improving
-    historicalMoodScores: [6.2, 6.0, 6.3, 6.5, 6.7, 6.8]
+    historicalMoodScores: [6.2, 6.0, 6.3, 6.5, 6.7, 6.8],
+    gender: "female"
   }
 ];
 

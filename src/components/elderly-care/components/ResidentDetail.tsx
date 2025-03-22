@@ -18,7 +18,7 @@ interface Resident {
   name: string;
   age: number;
   room: string;
-  healthScore: number;
+  healthScore?: number;
   lastChecked: string;
   alerts: number;
   status: 'stable' | 'attention' | 'critical';
@@ -36,6 +36,7 @@ interface Resident {
     dizzy: number;
   };
   historicalHealthScores?: number[];
+  gender: string;
 }
 
 interface Alert {
@@ -109,11 +110,37 @@ const ResidentDetail: React.FC<ResidentDetailProps> = ({ patient, patientAlerts 
         </div>
       </div>
 
+      {/* Resident Feeling Summary */}
+      <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">How {patient.name} is Feeling</h3>
+        <p className="text-gray-700 leading-relaxed">
+          {patient.status === 'critical' && 
+            `${patient.name} is feeling unwell today. ${patient.gender === 'male' ? 'He' : 'She'} has mentioned pain ${patient.keywordFrequency?.pain || 0} times 
+            and feeling tired ${patient.keywordFrequency?.tired || 0} times during recent conversations. 
+            ${patient.gender === 'male' ? 'His' : 'Her'} mood score is low at ${patient.moodScore?.toFixed(1)}/10, 
+            indicating significant distress. ${patient.gender === 'male' ? 'He' : 'She'} may need immediate attention 
+            and comfort.`
+          }
+          {patient.status === 'attention' && 
+            `${patient.name} is feeling somewhat concerned today. ${patient.gender === 'male' ? 'He' : 'She'} has mentioned 
+            discomfort ${patient.keywordFrequency?.pain || 0} times and tiredness ${patient.keywordFrequency?.tired || 0} times 
+            recently. ${patient.gender === 'male' ? 'His' : 'Her'} mood score of ${patient.moodScore?.toFixed(1)}/10 suggests 
+            ${patient.gender === 'male' ? 'he' : 'she'} could benefit from additional check-ins and emotional support today.`
+          }
+          {patient.status === 'stable' && 
+            `${patient.name} is feeling well today. ${patient.gender === 'male' ? 'He' : 'She'} has a positive mood score 
+            of ${patient.moodScore?.toFixed(1)}/10 and has mentioned feeling pain only ${patient.keywordFrequency?.pain || 0} times 
+            in recent conversations. ${patient.gender === 'male' ? 'His' : 'Her'} engagement level is strong, and 
+            ${patient.gender === 'male' ? 'he' : 'she'} seems to be in good spirits.`
+          }
+        </p>
+      </div>
+
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Health Score"
-          value={patient.healthScore}
+          value={patient.healthScore || 0}
           description="Overall health assessment score"
           color="green"
           icon={<Heart className="w-5 h-5" />}
@@ -250,7 +277,10 @@ const ResidentDetail: React.FC<ResidentDetailProps> = ({ patient, patientAlerts 
                 type={alert.type}
                 message={alert.message}
                 timestamp={alert.timestamp}
-                patientName={alert.patientName}
+                ResidentName={alert.patientName}
+                category={alert.category}
+                details={alert.details}
+                recommendedAction={alert.recommendedAction}
               />
             ))}
           </div>

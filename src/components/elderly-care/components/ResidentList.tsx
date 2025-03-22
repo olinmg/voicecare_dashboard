@@ -6,7 +6,7 @@ interface Resident {
   name: string;
   age: number;
   room: string;
-  healthScore: number;
+  healthScore?: number;
   lastChecked: string;
   alerts: number;
   status: 'stable' | 'attention' | 'critical';
@@ -24,6 +24,7 @@ interface Resident {
     dizzy: number;
   };
   historicalHealthScores?: number[];
+  gender: string;
 }
 
 interface ResidentListProps {
@@ -80,6 +81,16 @@ const ResidentList: React.FC<ResidentListProps> = ({ patients, onResidentClick, 
     }
   };
 
+  const getResidentFeeling = (patient: Resident): string => {
+    if (patient.status === 'critical') {
+      return 'feeling unwell';
+    } else if (patient.status === 'attention') {
+      return 'somewhat concerned';
+    } else {
+      return 'feeling well';
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200">
       <div className="overflow-x-auto">
@@ -91,6 +102,9 @@ const ResidentList: React.FC<ResidentListProps> = ({ patients, onResidentClick, 
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Room
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Feeling
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Health
@@ -134,6 +148,22 @@ const ResidentList: React.FC<ResidentListProps> = ({ patients, onResidentClick, 
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">
                   {patient.room}
+                </td>
+                <td className="px-4 py-3">
+                  <div className={`text-sm font-medium ${
+                    patient.status === 'stable'
+                      ? 'text-green-600'
+                      : patient.status === 'attention'
+                        ? 'text-yellow-600'
+                        : 'text-red-600'
+                  }`}>
+                    {getResidentFeeling(patient)}
+                    {patient.keywordFrequency?.pain && patient.keywordFrequency.pain > 3 && (
+                      <span className="text-xs ml-1">
+                        (mentions pain)
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex flex-col items-end justify-between">
