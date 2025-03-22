@@ -1,131 +1,125 @@
 import React from 'react';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
-  Filler,
-  Legend,
-  ChartOptions,
-  Scale,
-  ScaleOptionsByType,
-  CartesianScaleTypeRegistry
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import { MetricTrend } from '../data/mockData';
+  ResponsiveContainer,
+  Area,
+} from 'recharts';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-);
+interface DataPoint {
+  date: string;
+  value: number;
+  upperBound?: number;
+  lowerBound?: number;
+}
 
 interface LineChartProps {
-  title: string;
-  data: MetricTrend[];
-  description: string;
-  color: string;
-  fillColor: string;
-  threshold?: number;
+  data: DataPoint[];
+  color?: string;
+  title?: string;
   yAxisLabel?: string;
+  height?: number;
+  showVariance?: boolean;
+  domain?: [number, number];
 }
 
 const LineChart: React.FC<LineChartProps> = ({
-  title,
   data,
-  description,
-  color,
-  fillColor,
-  threshold,
-  yAxisLabel
+  color = '#3B82F6',
+  title,
+  yAxisLabel,
+  height = 300,
+  showVariance = false,
+  domain,
 }) => {
-  const chartData = {
-    labels: data.map(d => new Date(d.timestamp).toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    })),
-    datasets: [
-      {
-        label: title,
-        data: data.map(d => d.value),
-        borderColor: color,
-        backgroundColor: fillColor,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 4,
-        pointHoverRadius: 6
-      }
-    ]
-  };
-
-  const options: ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false
-      },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-        callbacks: {
-          label: (context) => {
-            return `${title}: ${context.parsed.y}${yAxisLabel || ''}`;
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: {
-          display: false
-        },
-        ticks: {
-          maxRotation: 0
-        }
-      },
-      y: {
-        type: 'linear' as const,
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
-        },
-        ticks: {
-          callback: function(value) {
-            return `${value}${yAxisLabel || ''}`;
-          }
-        }
-      }
-    },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
-    }
-  };
+  const hasVarianceData = data.some(point => point.upperBound !== undefined && point.lowerBound !== undefined);
+  const canShowVariance = showVariance && hasVarianceData;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-      <div className="mb-3">
-        <h3 className="font-medium text-gray-800">{title}</h3>
-        <p className="text-sm text-gray-500">{description}</p>
-      </div>
-      <div className="h-48">
-        <Line data={chartData} options={options} />
-      </div>
-      {threshold && (
-        <div className="mt-2 text-xs text-gray-500">
-          Threshold: {threshold}{yAxisLabel || ''}
-        </div>
+    <div className="w-full">
+      {title && (
+        <h3 className="text-sm font-medium text-gray-700 mb-2">{title}</h3>
       )}
+      <div style={{ width: '100%', height: `${height}px` }}>
+        <ResponsiveContainer>
+          <RechartsLineChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+            <XAxis
+              dataKey="date"
+              stroke="#6B7280"
+              tick={{ fontSize: 12 }}
+              tickLine={{ stroke: '#E5E7EB' }}
+            />
+            <YAxis
+              stroke="#6B7280"
+              tick={{ fontSize: 12 }}
+              tickLine={{ stroke: '#E5E7EB' }}
+              domain={domain || ['auto', 'auto']}
+              label={
+                yAxisLabel
+                  ? {
+                      value: yAxisLabel,
+                      angle: -90,
+                      position: 'insideLeft',
+                      style: { textAnchor: 'middle', fill: '#6B7280', fontSize: 12 },
+                    }
+                  : undefined
+              }
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'white',
+                border: '1px solid #E5E7EB',
+                borderRadius: '0.375rem',
+                padding: '0.5rem',
+              }}
+              labelStyle={{ color: '#374151', fontWeight: 500 }}
+              itemStyle={{ color: '#6B7280' }}
+            />
+            
+            {canShowVariance && (
+              <>
+                <defs>
+                  <linearGradient id={`colorVariance-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={color} stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor={color} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Area
+                  type="monotone"
+                  dataKey="upperBound"
+                  stroke="none"
+                  fillOpacity={0.2}
+                  fill={`url(#colorVariance-${color.replace('#', '')})`}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="lowerBound"
+                  stroke="none"
+                  fillOpacity={0.2}
+                  fill={`url(#colorVariance-${color.replace('#', '')})`}
+                />
+              </>
+            )}
+            
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={color}
+              strokeWidth={2}
+              dot={{ fill: color, strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: color }}
+            />
+          </RechartsLineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

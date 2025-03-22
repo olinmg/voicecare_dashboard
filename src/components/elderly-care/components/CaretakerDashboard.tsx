@@ -1,299 +1,280 @@
-import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Bell, Building2, Users, Clock } from 'lucide-react';
+import React, { useState } from 'react';
 import MetricCard from './MetricCard';
 import LineChart from './LineChart';
-import PatientList from './PatientList';
+import ResidentList from './ResidentList';
+import ResidentDetail from './ResidentDetail';
 import AlertItem from './AlertItem';
-import CollapsibleSection from './CollapsibleSection';
 import { 
-  facilities, 
-  patients, 
-  patientMetrics, 
-  patientAlerts, 
+  ResponsiveContainer, 
+  BarChart as RechartsBarChart,
+  Bar,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip 
+} from 'recharts';
+
+interface CaretakerDashboardProps {
+  metrics: {
+    assignedResidents: number;
+    tasksCompleted: number;
+    activeAlerts: number;
+    medicationAdherence: number;
+    avgMoodScore: number;
+    stressDetection: number;
+    conversationCoherence: number;
+    patientImprovementRate: number;
+    tasksTrend: Array<{ date: string; value: number }>;
+    medicationAdherenceTrend: Array<{ date: string; value: number }>;
+    moodScoreTrend: Array<{ date: string; value: number }>;
+    patientImprovementTrend: Array<{ date: string; value: number }>;
+    responseLatencyDistribution: Array<{ range: string; count: number }>;
+    keywordFrequency: Array<{ word: string; count: number }>;
+  };
+  patients: Array<{
+    id: string;
+    name: string;
+    age: number;
+    room: string;
+    lastChecked: string;
+    alerts: number;
+    status: 'stable' | 'attention' | 'critical';
+    medicationAdherence?: number;
+    moodScore?: number;
+    responseLatency?: number;
+    voiceToneVariation?: number;
+    stressDetection?: number;
+    conversationCoherence?: number;
+    engagementDuration?: number;
+    interactiveEngagement?: number;
+    keywordFrequency?: {
+      pain: number;
+      tired: number;
+      dizzy: number;
+    };
+  }>;
+  alerts: Array<{
+    type: 'high' | 'medium' | 'low';
+    message: string;
+    timestamp: string;
+    patientName: string;
+    category?: string;
+    details?: string;
+    recommendedAction?: string;
+  }>;
+}
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
+
+const CaretakerDashboard: React.FC<CaretakerDashboardProps> = ({
   metrics,
-  MetricTrend,
-  Facility,
-  Patient,
-  PatientMetric,
-  Alert
-} from '../data/mockData';
-
-// Component interfaces
-interface MetricCardProps {
-  title: string;
-  value: number | string;
-  description: string;
-  icon?: React.ReactNode;
-  color?: string;
-  unit?: string;
-  size?: 'sm' | 'md' | 'lg';
-}
-
-interface LineChartProps {
-  title: string;
-  data: MetricTrend[];
-  description: string;
-  color: string;
-  fillColor: string;
-  threshold?: number;
-  yAxisLabel?: string;
-}
-
-interface PatientListProps {
-  patients: Patient[];
-  onSelectPatient: (id: string) => void;
-  selectedPatientId?: string;
-}
-
-interface AlertItemProps {
-  alert: Alert;
-  onAcknowledge: (id: string) => void;
-}
-
-const CaretakerDashboard: React.FC = () => {
-  const [selectedFacilityId, setSelectedFacilityId] = useState(facilities[0].id);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-  const [alerts, setAlerts] = useState<Alert[]>(patientAlerts);
+  patients,
+  alerts,
+}) => {
+  const [selectedResidentId, setSelectedResidentId] = useState<string | null>(null);
   
-  // Get the selected facility
-  const selectedFacility = facilities.find((f: Facility) => f.id === selectedFacilityId) || facilities[0];
+  // Find the selected patient
+  const selectedResident = patients.find(p => p.id === selectedResidentId);
   
-  // Get patients for the selected facility
-  const facilityPatients = patients.filter((p: Patient) => p.facilityId === selectedFacilityId);
-  
-  // Set the first patient as selected if none is selected
-  useEffect(() => {
-    if (facilityPatients.length > 0 && !selectedPatientId) {
-      setSelectedPatientId(facilityPatients[0].id);
-    }
-  }, [facilityPatients, selectedPatientId]);
-  
-  // Get the selected patient
-  const selectedPatient = selectedPatientId 
-    ? patients.find((p: Patient) => p.id === selectedPatientId)
-    : null;
-  
-  // Get metrics for the selected patient
-  const patientMetricsData = selectedPatientId
-    ? patientMetrics.filter((pm: PatientMetric) => pm.patientId === selectedPatientId)
+  // Filter alerts for the selected patient
+  const patientAlerts = selectedResident 
+    ? alerts.filter(alert => alert.patientName === selectedResident.name)
     : [];
+
+  // Get critical patients that need attention
+  const criticalResidents = patients.filter(p => p.status === 'critical');
+  const attentionResidents = patients.filter(p => p.status === 'attention');
   
-  // Handle alert acknowledgement
-  const handleAcknowledgeAlert = (alertId: string) => {
-    setAlerts((prev: Alert[]) => prev.map((alert: Alert) => 
-      alert.id === alertId ? { ...alert, acknowledged: true } : alert
-    ));
+  // Handle patient selection
+  const handleResidentClick = (patient: typeof patients[0]) => {
+    setSelectedResidentId(patient.id);
   };
   
-  // Get alerts for the selected facility
-  const facilityAlerts = alerts.filter(
-    (alert: Alert) => facilityPatients.some((p: Patient) => p.id === alert.patientId)
-  );
-  
-  // Count unacknowledged alerts
-  const unacknowledgedAlerts = facilityAlerts.filter((a: Alert) => !a.acknowledged).length;
-  
-  // Get trend data for a patient metric
-  const getMetricTrends = (metricId: string): MetricTrend[] => {
-    const metricData = patientMetricsData.find((pm: PatientMetric) => pm.metricId === metricId);
-    return metricData?.trends || [];
+  // Handle back to overview
+  const handleBackToOverview = () => {
+    setSelectedResidentId(null);
   };
-  
-  return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Caretaker Dashboard: {selectedFacility.name}
-        </h1>
-        <p className="text-gray-600">{selectedFacility.location}</p>
+
+  // If a patient is selected, show the patient detail view
+  if (selectedResident) {
+    return (
+      <div className="space-y-6">
+        <button 
+          className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
+          onClick={handleBackToOverview}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Resident Overview
+        </button>
+        
+        <ResidentDetail patient={selectedResident} patientAlerts={patientAlerts} />
       </div>
-      
-      <CollapsibleSection title="Facility Overview" defaultOpen={true} className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <MetricCard 
-            title="Patients" 
-            value={selectedFacility.totalPatients}
-            description="Number of patients in this facility"
-            icon={<Users />}
-            color="indigo"
-          />
-          <MetricCard 
-            title="Caretakers" 
-            value={selectedFacility.totalCaretakers}
-            description="Number of caretakers assigned to this facility"
-            icon={<Building2 />}
-            color="green"
-          />
-          <MetricCard 
-            title="Active Alerts" 
-            value={unacknowledgedAlerts}
-            description="Number of unresolved alerts that require attention"
-            icon={<AlertTriangle />}
-            color={unacknowledgedAlerts > 0 ? "red" : "gray"}
-          />
-          <MetricCard 
-            title="Last Updated" 
-            value={new Date().toLocaleTimeString()}
-            description="Time when the dashboard data was last refreshed"
-            icon={<Clock />}
-            color="blue"
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Overview Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="Assigned Residents"
+          value={metrics.assignedResidents}
+          description="Number of patients under your care"
+          color="blue"
+        />
+        <MetricCard
+          title="Average Mood Score"
+          value={metrics.avgMoodScore}
+          unit="/10"
+          description="Average mood score of your patients"
+          color="purple"
+          trend={metrics.avgMoodScore >= 7 ? 'up' : 'down'}
+          percentChange={1.5}
+        />
+        <MetricCard
+          title="Tasks Completed"
+          value={metrics.tasksCompleted}
+          description="Tasks completed in the last 24 hours"
+          color="indigo"
+        />
+        <MetricCard
+          title="Active Alerts"
+          value={metrics.activeAlerts}
+          description="Number of active alerts requiring attention"
+          color="red"
+          trend={metrics.activeAlerts > 0 ? 'up' : 'down'}
+          percentChange={metrics.activeAlerts > 0 ? 15 : -15}
+        />
+      </div>
+
+      {/* Critical Residents Alert Banner */}
+      {criticalResidents.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Residents Requiring Immediate Attention ({criticalResidents.length})
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <ul className="list-disc pl-5 space-y-1">
+                  {criticalResidents.map(patient => (
+                    <li key={patient.id} onClick={() => handleResidentClick(patient)} className="cursor-pointer hover:underline">
+                      {patient.name} - Mood Score: {patient.moodScore ? patient.moodScore.toFixed(1) : 'N/A'} - {patient.alerts} alerts
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Residents Requiring Regular Attention */}
+      {attentionResidents.length > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">
+                Residents Requiring Attention ({attentionResidents.length})
+              </h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <ul className="list-disc pl-5 space-y-1">
+                  {attentionResidents.map(patient => (
+                    <li key={patient.id} onClick={() => handleResidentClick(patient)} className="cursor-pointer hover:underline">
+                      {patient.name} - Mood Score: {patient.moodScore ? patient.moodScore.toFixed(1) : 'N/A'} - {patient.alerts} alerts
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Resident List */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">All Assigned Residents</h3>
+          <p className="text-sm text-gray-500 mt-1">Click on a patient to view detailed metrics and trends</p>
+        </div>
+        <ResidentList 
+          patients={patients} 
+          onResidentClick={handleResidentClick}
+          activeResidentId={selectedResidentId || undefined}
+        />
+      </div>
+
+      {/* Overview Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Average Mood Score Trend</h3>
+          <LineChart
+            data={metrics.moodScoreTrend}
+            yAxisLabel="Score"
+            color="#8B5CF6"
           />
         </div>
-      </CollapsibleSection>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <CollapsibleSection title="Patients" defaultOpen={true}>
-          <PatientList 
-            patients={facilityPatients}
-            onSelectPatient={setSelectedPatientId}
-            selectedPatientId={selectedPatientId || undefined}
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Medication Adherence Trend</h3>
+          <LineChart
+            data={metrics.medicationAdherenceTrend}
+            yAxisLabel="Rate (%)"
+            color="#3B82F6"
+            domain={[85, 95]}
           />
-        </CollapsibleSection>
-        
-        <CollapsibleSection title="Alerts" defaultOpen={true}>
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center">
-              <Bell size={16} className="text-gray-400 mr-1" />
-              <span className={unacknowledgedAlerts > 0 ? "text-red-500 font-medium" : "text-gray-500"}>
-                {unacknowledgedAlerts} unacknowledged
-              </span>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            {facilityAlerts.length > 0 ? (
-              facilityAlerts.map(alert => (
-                <AlertItem 
-                  key={alert.id} 
-                  alert={alert} 
-                  onAcknowledge={handleAcknowledgeAlert}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                No alerts to display
-              </div>
-            )}
-          </div>
-        </CollapsibleSection>
-        
-        <CollapsibleSection title="Patient Details" defaultOpen={true}>
-          {selectedPatient ? (
-            <>
-              <div className="mb-4">
-                <h3 className="font-medium text-gray-800 text-lg">{selectedPatient.name}</h3>
-                <div className="flex justify-between mt-1">
-                  <p className="text-sm text-gray-500">
-                    Age: {selectedPatient.age} • Room: {selectedPatient.room}
-                  </p>
-                  <div className={`text-xs px-2 py-0.5 rounded-full border ${
-                    selectedPatient.healthStatus === 'Stable' 
-                      ? 'bg-green-100 text-green-800 border-green-200'
-                      : selectedPatient.healthStatus === 'Needs Attention'
-                        ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                        : 'bg-red-100 text-red-800 border-red-200'
-                  }`}>
-                    {selectedPatient.healthStatus}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <MetricCard 
-                  title="Medication Adherence" 
-                  value={selectedPatient.medicationAdherence}
-                  description="Percentage of times the patient confirms taking prescribed medication"
-                  unit="%"
-                  size="sm"
-                  color={selectedPatient.medicationAdherence < 70 ? "red" : "green"}
-                />
-                <MetricCard 
-                  title="Mood Score" 
-                  value={selectedPatient.moodScore.toFixed(1)}
-                  description="Sentiment analysis score (1-10) of patient's emotional state"
-                  size="sm"
-                  color={selectedPatient.moodScore < 5 ? "red" : "indigo"}
-                />
-                <MetricCard 
-                  title="Stress Level" 
-                  value={selectedPatient.stressLevel.toFixed(1)}
-                  description="Detected level of stress in patient's voice (1-10)"
-                  size="sm"
-                  color={selectedPatient.stressLevel > 6 ? "red" : "green"}
-                />
-                <MetricCard 
-                  title="Last Checked" 
-                  value={new Date(selectedPatient.lastChecked).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  description="Time when patient was last checked in on"
-                  size="sm"
-                  color="blue"
-                />
-              </div>
-              
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="text-sm font-medium text-gray-700">Patient Notes</h4>
-                <button className="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-colors">
-                  Add Note
-                </button>
-              </div>
-              
-              <div className="text-xs text-gray-500 border border-gray-200 rounded p-2 bg-gray-50">
-                {selectedPatient.healthStatus === 'Critical' ? (
-                  "Patient requires close monitoring. Significant decline in mood and medication adherence observed. Consider scheduling additional check-ins."
-                ) : selectedPatient.healthStatus === 'Needs Attention' ? (
-                  "Patient showing signs of increased stress levels. Recent conversation analysis indicates potential sleep issues. Follow up recommended."
-                ) : (
-                  "Patient doing well. Maintaining consistent medication adherence and stable mood patterns. Continue regular check-ins."
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-48 text-gray-500">
-              Select a patient to view details
-            </div>
-          )}
-        </CollapsibleSection>
+        </div>
       </div>
-      
-      {selectedPatient && (
-        <CollapsibleSection title="Patient Metrics History" defaultOpen={true}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <LineChart 
-              title="Mood Score"
-              data={getMetricTrends('moodScore')}
-              description="Sentiment analysis score (1-10) of patient's emotional state from voice analysis"
-              color="rgb(99, 102, 241)" // Indigo
-              fillColor="rgba(99, 102, 241, 0.1)"
-              threshold={5}
+
+      {/* Keyword Frequency Analysis */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Keyword Frequency Analysis Across All Residents</h3>
+        <div style={{ width: '100%', height: '300px' }}>
+          <ResponsiveContainer>
+            <RechartsBarChart
+              data={metrics.keywordFrequency}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              layout="vertical"
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis type="number" stroke="#6B7280" />
+              <YAxis dataKey="word" type="category" stroke="#6B7280" width={80} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#EF4444" radius={[0, 4, 4, 0]} name="Keyword Mentions" />
+            </RechartsBarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Recent Alerts */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Alerts</h3>
+        <div className="space-y-3">
+          {alerts.slice(0, 5).map((alert, index) => (
+            <AlertItem
+              key={index}
+              type={alert.type}
+              message={alert.message}
+              timestamp={alert.timestamp}
+              patientName={alert.patientName}
             />
-            <LineChart 
-              title="Stress Detection Score"
-              data={getMetricTrends('stressLevel')}
-              description="Level of stress detected in patient's voice from acoustic features (1-10)"
-              color="rgb(220, 38, 38)" // Red
-              fillColor="rgba(220, 38, 38, 0.1)"
-              threshold={6}
-            />
-            <LineChart 
-              title="Medication Adherence"
-              data={getMetricTrends('medAdherence').map(t => ({ ...t, value: t.value * 10 }))} // Scale to 0-100%
-              description="Percentage of times the patient confirms taking prescribed medication"
-              color="rgb(16, 185, 129)" // Green
-              fillColor="rgba(16, 185, 129, 0.1)"
-              threshold={7}
-              yAxisLabel="%"
-            />
-            <LineChart 
-              title="Conversation Coherence"
-              data={getMetricTrends('conversationCoherence')}
-              description="Assessment of logical flow and structure of the patient's responses (1-10)"
-              color="rgb(139, 92, 246)" // Purple
-              fillColor="rgba(139, 92, 246, 0.1)"
-              threshold={5}
-            />
-          </div>
-        </CollapsibleSection>
-      )}
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

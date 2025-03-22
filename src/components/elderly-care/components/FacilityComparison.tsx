@@ -1,74 +1,77 @@
 import React from 'react';
-import { Facility } from '../data/mockData';
+
+interface FacilityMetrics {
+  occupancyRate: number;
+  patientSatisfaction: number;
+  staffEfficiency: number;
+}
+
+interface FacilityData {
+  name: string;
+  metrics: FacilityMetrics;
+}
 
 interface FacilityComparisonProps {
-  facilities: Facility[];
+  facilities: FacilityData[];
 }
 
 const FacilityComparison: React.FC<FacilityComparisonProps> = ({ facilities }) => {
-  const metrics = ['avgMoodScore', 'avgStressLevel', 'medicationAdherence'];
-  const metricLabels = {
-    avgMoodScore: 'Mood Score',
-    avgStressLevel: 'Stress Level',
-    medicationAdherence: 'Medication Adherence'
+  const metrics = [
+    { key: 'occupancyRate', label: 'Occupancy Rate', unit: '%' },
+    { key: 'patientSatisfaction', label: 'Resident Satisfaction', unit: '%' },
+    { key: 'staffEfficiency', label: 'Staff Efficiency', unit: '%' },
+  ] as const;
+
+  const getComparisonColor = (value: number, metric: string) => {
+    const avg = facilities.reduce((sum, f) => sum + f.metrics[metric as keyof typeof f.metrics], 0) / facilities.length;
+    if (value > avg) return 'text-green-600';
+    if (value < avg) return 'text-red-600';
+    return 'text-gray-600';
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Facility
-            </th>
-            {metrics.map(metric => (
-              <th key={metric} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {metricLabels[metric as keyof typeof metricLabels]}
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Facility Comparison</h3>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Facility
               </th>
-            ))}
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Patients
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Caretakers
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {facilities.map(facility => (
-            <tr key={facility.id}>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div>
-                  <div className="text-sm font-medium text-gray-900">{facility.name}</div>
-                  <div className="text-sm text-gray-500">{facility.location}</div>
-                </div>
-              </td>
-              {metrics.map(metric => (
-                <td key={metric} className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className={`h-2 w-2 rounded-full mr-2 ${
-                      metric === 'avgStressLevel'
-                        ? facility.metrics[metric] < 5 ? 'bg-green-400' : 'bg-red-400'
-                        : facility.metrics[metric] > 0.7 ? 'bg-green-400' : 'bg-red-400'
-                    }`} />
-                    <span className="text-sm text-gray-900">
-                      {metric === 'medicationAdherence'
-                        ? `${(facility.metrics[metric] * 100).toFixed(1)}%`
-                        : facility.metrics[metric].toFixed(1)}
-                    </span>
-                  </div>
-                </td>
+              {metrics.map((metric) => (
+                <th
+                  key={metric.key}
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  {metric.label}
+                </th>
               ))}
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {facility.totalPatients}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {facility.totalCaretakers}
-              </td>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {facilities.map((facility, index) => (
+              <tr key={facility.name} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  {facility.name}
+                </td>
+                {metrics.map((metric) => {
+                  const value = facility.metrics[metric.key];
+                  return (
+                    <td
+                      key={`${facility.name}-${metric.key}`}
+                      className={`px-4 py-3 text-sm font-medium ${getComparisonColor(value, metric.key)}`}
+                    >
+                      {value}
+                      {metric.unit}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

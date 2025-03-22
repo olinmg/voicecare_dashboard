@@ -1,91 +1,85 @@
 import React from 'react';
-import { Alert } from '../data/mockData';
-import { AlertTriangle, Pill, Heart, Brain } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
 
 interface AlertItemProps {
-  alert: Alert;
-  onAcknowledge: (id: string) => void;
+  type: 'high' | 'medium' | 'low';
+  message: string;
+  timestamp: string;
+  facilityName?: string;
+  ResidentName?: string;
+  category?: string;
+  details?: string;
+  recommendedAction?: string;
 }
 
-const AlertItem: React.FC<AlertItemProps> = ({ alert, onAcknowledge }) => {
-  const getAlertIcon = (type: string) => {
+const AlertItem: React.FC<AlertItemProps> = ({
+  type,
+  message,
+  timestamp,
+  facilityName,
+  ResidentName,
+  category,
+  details,
+  recommendedAction,
+}) => {
+  const getAlertColor = () => {
     switch (type) {
-      case 'Medication':
-        return <Pill className="w-4 h-4" />;
-      case 'Health':
-        return <Heart className="w-4 h-4" />;
-      case 'Behavior':
-        return <Brain className="w-4 h-4" />;
-      case 'Emergency':
-        return <AlertTriangle className="w-4 h-4" />;
+      case 'high':
+        return 'bg-red-50 border-red-200 text-red-700';
+      case 'medium':
+        return 'bg-yellow-50 border-yellow-200 text-yellow-700';
+      case 'low':
+        return 'bg-blue-50 border-blue-200 text-blue-700';
       default:
-        return <AlertTriangle className="w-4 h-4" />;
+        return 'bg-gray-50 border-gray-200 text-gray-700';
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'Low':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-100';
-      case 'Medium':
-        return 'bg-orange-50 text-orange-700 border-orange-100';
-      case 'High':
-        return 'bg-red-50 text-red-700 border-red-100';
+  const getAlertIcon = () => {
+    switch (type) {
+      case 'high':
+        return <AlertTriangle className="w-5 h-5 text-red-500" />;
+      case 'medium':
+        return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+      case 'low':
+        return <AlertTriangle className="w-5 h-5 text-blue-500" />;
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-100';
+        return <AlertTriangle className="w-5 h-5 text-gray-500" />;
     }
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { 
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   return (
-    <div className={`p-3 rounded-lg border ${alert.acknowledged ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-200'}`}>
-      <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-3">
-          <div className={`mt-0.5 ${
-            alert.severity === 'High' ? 'text-red-500' :
-            alert.severity === 'Medium' ? 'text-orange-500' :
-            'text-yellow-500'
-          }`}>
-            {getAlertIcon(alert.type)}
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="font-medium text-gray-900 text-sm">
-                {alert.type} Alert
-              </span>
-              <span className={`text-xs px-1.5 py-0.5 rounded-full border ${getSeverityColor(alert.severity)}`}>
-                {alert.severity}
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 mt-0.5">
-              {alert.message}
-            </p>
-            <div className="flex items-center space-x-2 mt-1">
-              <span className="text-xs text-gray-500">
-                {formatTimestamp(alert.timestamp)}
-              </span>
-              {alert.acknowledged && (
-                <span className="text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
-                  Acknowledged
-                </span>
-              )}
-            </div>
-          </div>
+    <div
+      className={`flex items-start p-3 rounded-lg border ${getAlertColor()} cursor-pointer hover:shadow-sm transition-shadow`}
+    >
+      <div className="flex-shrink-0 mr-3">
+        {getAlertIcon()}
+      </div>
+      <div className="flex-grow min-w-0">
+        <div className="flex justify-between items-start">
+          <h4 className={`font-medium ${getAlertColor()}`}>{message}</h4>
+          <span className="text-xs text-gray-500 ml-2 whitespace-nowrap">{timestamp}</span>
         </div>
-        {!alert.acknowledged && (
-          <button
-            onClick={() => onAcknowledge(alert.id)}
-            className="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-colors"
-          >
-            Acknowledge
-          </button>
+        
+        {(ResidentName || facilityName) && (
+          <p className="text-xs text-gray-600 mt-1">
+            {ResidentName && `Resident: ${ResidentName}`}
+            {ResidentName && facilityName && ' | '}
+            {facilityName && `Facility: ${facilityName}`}
+          </p>
+        )}
+        
+        {details && (
+          <p className="text-sm mt-2 text-gray-700">
+            {details}
+          </p>
+        )}
+        
+        {recommendedAction && (
+          <div className="mt-2">
+            <p className="text-xs font-medium text-gray-700">Recommended Action:</p>
+            <p className="text-sm text-gray-700">{recommendedAction}</p>
+          </div>
         )}
       </div>
     </div>
