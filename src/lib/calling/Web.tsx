@@ -84,7 +84,7 @@ export const WebCallModal = ({onClose, roleDescription, prompt }: WebCallModalPr
         <div className="flex items-center gap-2 text-lg mt-2 mb-4">
           <div className="w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
           <span className={isVoiceCare ? "text-purple-700 font-medium" : "text-orange-700 font-medium"}>
-            {isVoiceCare ? "Setting up your wellness call..." : "Connecting to interview..."}
+            {isVoiceCare ? "Setting up your wellness call..." : "Setting up your wellness check-in..."}
           </span>
         </div>
       );
@@ -94,7 +94,7 @@ export const WebCallModal = ({onClose, roleDescription, prompt }: WebCallModalPr
           <div className="w-4 h-4 bg-green-400 rounded-full"></div>
           <span className={isVoiceCare ? "text-purple-700 font-medium" : "text-orange-700 font-medium"}>
             {assistantIsSpeaking 
-              ? (isVoiceCare ? "Wellness assistant is speaking..." : "AI interviewer is speaking...") 
+              ? (isVoiceCare ? "Wellness assistant is speaking..." : "VoiceCare assistant is speaking...") 
               : "Listening to you..."}
           </span>
         </div>
@@ -168,9 +168,7 @@ export const WebCallModal = ({onClose, roleDescription, prompt }: WebCallModalPr
           
           const assistantOptions = {
             name: (isVoiceCare ? 'VoiceCare Assistant' : 'Customer Insights AI').slice(0, 39),
-            firstMessage: isVoiceCare 
-              ? "Hello! This is VoiceCare calling for your daily check-in. How are you feeling today?" 
-              : "Hello! I'm excited to learn about your experience with our product. Would you mind sharing how you typically use it in your day-to-day work?",
+            firstMessage: "Hello! This is VoiceCare calling for your daily check-in. How are you feeling today?",
             transcriber: {
               provider: "deepgram" as const,
               model: "nova-2" as const,
@@ -182,12 +180,10 @@ export const WebCallModal = ({onClose, roleDescription, prompt }: WebCallModalPr
             },
             model: {
               provider: "openai" as const,
-              model: "gpt-4" as const,
+              model: "gpt-4o" as const,
               messages: [{
                 role: "system" as const,
-                content: isVoiceCare ? 
-                  `You are the VoiceCare AI Assistant making a daily check-in call to an elderly person. Your goal is to have a friendly, empathetic conversation about their well-being, checking on their health, medication adherence, and general wellness. Be patient, speak clearly, and focus on important health factors like sleep, nutrition, medication, and mood. If they mention any concerning symptoms or issues, gently probe for more details. End the conversation on a positive note with encouragement. The person you're calling is: ${roleDescription}. This is a demo of the VoiceCare system.` : 
-                  prompt
+                content: `You are the VoiceCare AI Assistant making a daily check-in call to an elderly person. Your goal is to have a friendly, empathetic conversation about their well-being, checking on their health, medication adherence, and general wellness. Be patient, speak clearly, and focus on important health factors like sleep, nutrition, medication, and mood. If they mention any concerning symptoms or issues, gently probe for more details. End the conversation on a positive note with encouragement. The person you're calling is: ${roleDescription}. This is a demo of the VoiceCare system.`
               }]
             },
             startSpeakingPlan: {
@@ -227,7 +223,7 @@ export const WebCallModal = ({onClose, roleDescription, prompt }: WebCallModalPr
         <div className={`p-4 ${isVoiceCare ? 'bg-purple-50' : 'bg-orange-50'} border-b ${isVoiceCare ? 'border-purple-200' : 'border-orange-200'}`}>
           <div className="flex justify-between items-center">
             <h2 className={`text-xl font-bold ${isVoiceCare ? 'text-purple-800' : 'text-orange-800'}`}>
-              {isVoiceCare ? 'Wellness Check-In Call' : 'Customer Interview in Progress'}
+              {isVoiceCare ? 'Wellness Check-In Call' : 'VoiceCare Wellness Check-In'}
             </h2>
             <button 
               onClick={onClose}
@@ -254,12 +250,12 @@ export const WebCallModal = ({onClose, roleDescription, prompt }: WebCallModalPr
             
             <div>
               <h3 className={`font-medium mb-1 ${isVoiceCare ? 'text-purple-800 text-lg' : 'text-orange-800'}`}>
-                {isVoiceCare ? 'Daily Wellness Check-In' : 'Customer Feedback Analysis'}
+                {isVoiceCare ? 'Daily Wellness Check-In' : 'VoiceCare Wellness Check-In'}
               </h3>
               <p className="text-gray-600">
                 {isVoiceCare 
                   ? 'Friendly conversation to check on wellbeing and provide support.' 
-                  : 'Getting valuable customer insights.'}
+                  : 'Monitoring health and providing wellness support.'}
               </p>
             </div>
           </div>

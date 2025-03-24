@@ -4,7 +4,9 @@ import ManagerDashboard from './components/ManagerDashboard';
 import CaretakerDashboard from './components/CaretakerDashboard';
 import ResidentManagement from './components/ResidentManagement';
 import DemoInterview from './DemoInterview';
-import { managerMetrics, caretakerMetrics, facilities, patients as mockPatients, alerts } from './mockData';
+import { managerMetrics, caretakerMetrics, facilities, patientsWithDiaries as mockPatients, alerts } from './mockData';
+import { setupWebTestInterview, setupVapiPhoneTestInterview } from '../../lib/calling/testInterview';
+import { WebCallModal } from '../../lib/calling/Web';
 
 type DashboardTab = 'demo' | 'manager' | 'caretaker' | 'residents';
 
@@ -41,6 +43,12 @@ interface BaseResident {
   historicalHealthScores?: number[];
   historicalMoodScores?: number[];
   facilityId?: string;
+  diaryEntries?: {
+    date: string;
+    content: string;
+    activities: string[];
+    medicallyRelevant?: boolean;
+  }[];
 }
 
 // Use the mock data type to define the resident type explicitly
@@ -60,6 +68,8 @@ const residentAlerts = alerts.filter(alert => 'patientName' in alert) as {
 const ElderlyCareHome: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('demo');
   const [residentData, setResidentData] = useState<Patient[]>(mockPatients);
+  const [isCallLoading, setIsCallLoading] = useState(false);
+  const [webCallData, setWebCallData] = useState<{ roleDescription: string; prompt: string } | null>(null);
 
   // Update all residents with derived health scores based on other metrics whenever residentData changes
   useEffect(() => {
@@ -123,6 +133,63 @@ const ElderlyCareHome: React.FC = () => {
     console.log('Updated residents:', withHealthScores);
   };
 
+  const handleTestInterview = async (
+    type: 'web' | 'phoneVapi',
+    data: { roleDescription: string; phoneNumber?: string }
+  ) => {
+    setIsCallLoading(true);
+    try {
+      const interviewId = 'f5d93e85-41b6-4be7-b7c7-63e01ef94062';
+      const user = 'e0bce9dc-20a1-709c-dc40-248c8ad24093';
+      
+      // First get the prompt from the web test interview setup
+      const responseData = await setupWebTestInterview({
+        userId: user,
+        interviewId,
+        roleDescription: data.roleDescription
+      });
+
+      if (type === 'web') {
+        // For web calls, store the data and show the web call interface
+        setWebCallData({
+          roleDescription: data.roleDescription,
+          prompt: responseData.prompt
+        });
+      } else if (type === 'phoneVapi') {
+        // For phone calls, set up the Vapi call
+        await setupVapiPhoneTestInterview(
+          user,
+          interviewId,
+          data.phoneNumber!,
+          data.roleDescription,
+          responseData.prompt,
+          'VoiceCare Wellness Check-In'
+        );
+        alert('Phone call has been scheduled. You should receive a call shortly.');
+      }
+    } catch (error) {
+      console.error('Error setting up call:', error);
+      
+      // Provide more helpful error message to the user
+      let errorMessage = 'Failed to set up call';
+      
+      if (error instanceof Error) {
+        // Check for specific error patterns to provide helpful feedback
+        if (error.message.includes('Backend API returned HTML')) {
+          errorMessage = 'Backend server issue: Please check that the backend API is running correctly and the URL is configured properly in environment variables';
+        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+          errorMessage = 'Network error: Cannot connect to the backend server. Please check your internet connection and verify the backend is running.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setIsCallLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Fixed position */}
@@ -159,7 +226,7 @@ const ElderlyCareHome: React.FC = () => {
                 </p>
               </div>
               <div className="w-full max-w-xs">
-                <DemoInterview />
+                <DemoInterview onInitiateCall={handleTestInterview} />
               </div>
             </div>
           ) : activeTab === 'manager' ? (
@@ -182,6 +249,15 @@ const ElderlyCareHome: React.FC = () => {
           )}
         </div>
       </main>
+
+      {/* Display WebCallModal when web call data is available */}
+      {webCallData && (
+        <WebCallModal
+          onClose={() => setWebCallData(null)}
+          roleDescription={webCallData.roleDescription}
+          prompt={webCallData.prompt}
+        />
+      )}
     </div>
   );
 };

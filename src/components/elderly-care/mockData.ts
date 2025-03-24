@@ -493,4 +493,209 @@ export const alerts = [
     details: "Balance assessment score decreased by 15%. Resident reported feeling 'dizzy' 3 times in recent calls.",
     recommendedAction: "Conduct fall risk assessment and implement preventive measures"
   }
-]; 
+];
+
+// Sample diary entries generator function
+export const generateDiaryEntries = (days = 30, gender = 'female') => {
+  const pronoun = gender === 'male' ? 'he' : 'she';
+  const possessivePronoun = gender === 'male' ? 'his' : 'her';
+  const capitalPronoun = gender === 'male' ? 'He' : 'She';
+  
+  // First part of the activities (main activity) - expanded list with more variety
+  const activities = [
+    // Social activities
+    `Had dinner with ${possessivePronoun} grandson who came to visit. They shared stories about family vacations and looked at old photographs together.`,
+    `Received a surprise visit from ${possessivePronoun} niece and her children. ${capitalPronoun} was delighted to see the young ones and gave them each a small gift ${pronoun} had been saving.`,
+    `Celebrated another resident's birthday in the common room. ${capitalPronoun} helped serve cake and led everyone in singing happy birthday.`,
+    `Had a video call with ${possessivePronoun} son who lives abroad. They talked for nearly an hour about the grandchildren's school achievements and upcoming holiday plans.`,
+    `Enjoyed lunch with a small group of friends in the dining hall. The conversation was lively as they discussed a book they had all recently read.`,
+    
+    // Entertainment activities
+    `Watched a documentary about ocean life and was very engaged. ${capitalPronoun} mentioned wanting to visit the aquarium soon to see some of the sea creatures up close.`,
+    `Attended a classical music concert held in the community room. ${capitalPronoun} particularly enjoyed the violin solos that reminded ${pronoun} of concerts from years ago.`,
+    `Participated in movie night and watched a classic film from the 1960s. ${capitalPronoun} shared interesting facts about the actors with other residents afterward.`,
+    `Listened to an audiobook about historical figures. ${capitalPronoun} has always been fascinated by history and enjoys learning new details about famous people.`,
+    `Watched a comedy show on television with a group of residents. The laughter was contagious, and everyone had a wonderful time together.`,
+    
+    // Creative activities
+    `Participated in the group painting class and created a landscape painting. The instructor complimented ${possessivePronoun} use of color and attention to detail.`,
+    `Joined the poetry writing workshop and composed a short poem about seasons. ${capitalPronoun} read it aloud to the group and received warm applause.`,
+    `Worked on a knitting project for ${possessivePronoun} great-granddaughter. The sweater is nearly complete and features a beautiful pattern ${pronoun} designed.`,
+    `Took part in a ceramics class and made a small decorative bowl. ${capitalPronoun} plans to glaze it next week and give it to ${possessivePronoun} daughter.`,
+    `Joined the choir practice and rehearsed songs for the upcoming spring concert. The music director mentioned that ${possessivePronoun} voice adds beautiful harmony to the group.`,
+    
+    // Games and cognitive activities
+    `Played bingo with other residents and won twice. ${capitalPronoun} was delighted with the small prize and shared it with ${possessivePronoun} neighbor.`,
+    `Participated in a chess tournament organized by the activities department. Though ${pronoun} didn't win, ${pronoun} enjoyed the mental challenge and social interaction.`,
+    `Completed a 500-piece puzzle with help from two other residents. The finished image of a mountain landscape will be framed and displayed in the common area.`,
+    `Played card games with ${possessivePronoun} regular Tuesday group. ${capitalPronoun} taught everyone a new game ${pronoun} learned from ${possessivePronoun} grandchildren.`,
+    `Participated in a memory game session with good results. The activity coordinator mentioned that ${pronoun} has shown consistent improvement in these cognitive exercises.`,
+    
+    // Physical activities
+    `Went for a walk in the garden and enjoyed identifying different flowers. ${capitalPronoun} spoke about how gardening was a favorite hobby in younger years.`,
+    `Participated in the chair yoga class and demonstrated impressive flexibility. The instructor used ${possessivePronoun} form as an example for others.`,
+    `Joined the morning stretching group and completed all exercises with enthusiasm. ${capitalPronoun} mentioned feeling more energetic afterward.`,
+    `Took a short walk around the outdoor trail with ${possessivePronoun} walker. The fine weather allowed for a longer outing than usual, which ${pronoun} thoroughly enjoyed.`,
+    `Participated in the balloon volleyball game in the activity room. ${capitalPronoun} helped ${possessivePronoun} team score several points with well-placed hits.`,
+    
+    // Educational and enrichment
+    `Attended a lecture about local history presented by a museum curator. ${capitalPronoun} asked several insightful questions that enhanced the discussion.`,
+    `Participated in a technology workshop and learned how to use a new feature on ${possessivePronoun} tablet. ${capitalPronoun} was excited to show off the new skills.`,
+    `Attended a cooking demonstration focusing on healthy desserts. ${capitalPronoun} requested a copy of the recipe to share with the kitchen staff.`,
+    `Joined a discussion group about current events and contributed thoughtful perspectives. Other participants appreciated ${possessivePronoun} well-informed views.`,
+    `Participated in a language class where ${pronoun} practiced conversational Spanish. ${capitalPronoun} used to travel to Mexico frequently and enjoys keeping up the language.`,
+    
+    // Community and contribution
+    `Helped organize the community bookshelf and recommended books to other residents. ${capitalPronoun} has an extensive knowledge of mystery novels and enjoys suggesting titles.`,
+    `Volunteered to help with the facility newsletter and contributed a short article about ${possessivePronoun} favorite recipes. The editor praised ${possessivePronoun} clear writing style.`,
+    `Participated in a charity knitting project making baby blankets for the local hospital. ${capitalPronoun} has completed three blankets so far this month.`,
+    `Helped welcome a new resident by showing them around and introducing them to others. The staff thanked ${pronoun} for being such a kind ambassador.`,
+    `Assisted with decorating the common areas for the upcoming holiday. ${capitalPronoun} has a good eye for arrangement and made beautiful centerpieces for the tables.`,
+    
+    // Reminiscence and life story
+    `Shared stories from ${possessivePronoun} youth during group reminiscence time. Everyone was particularly amused by the tale of ${possessivePronoun} first job at a small town newspaper.`,
+    `Looked through old family albums with a staff member and identified people in photographs. These will be digitized and shared with ${possessivePronoun} family.`,
+    `Recorded a video message sharing wisdom and advice for ${possessivePronoun} great-grandchildren. ${capitalPronoun} spoke about the importance of education and kindness.`,
+    `Participated in the life story project and discussed ${possessivePronoun} experiences during important historical events. These stories will be compiled into a book for residents.`,
+    `Shared memories of ${possessivePronoun} wedding day during a themed reminiscence session. ${capitalPronoun} described the dress, music, and special moments in vivid detail.`,
+    
+    // Outings and trips
+    `Took a trip to the local museum with other residents. ${capitalPronoun} was particularly interested in the historical exhibits about the local area.`,
+    `Went on a scenic drive through the countryside with a small group of residents. The autumn colors were spectacular, and ${pronoun} pointed out several landmarks.`,
+    `Visited a nearby botanical garden and enjoyed the seasonal flower display. ${capitalPronoun} used to have a similar flower variety in ${possessivePronoun} own garden.`,
+    `Attended a concert at the downtown performing arts center. It was ${possessivePronoun} first outing to this venue, and ${pronoun} was impressed by the acoustics.`,
+    `Joined the group trip to a local farmers' market and selected fresh produce. ${capitalPronoun} gave the chef suggestions for using the seasonal vegetables in upcoming meals.`,
+    
+    // Special interests and hobbies
+    `Watched ${possessivePronoun} favorite TV show and discussed it afterward. ${capitalPronoun} has been following this series for several seasons and enjoys predicting what will happen next.`,
+    `Enjoyed a book from the library about travel. ${capitalPronoun} shared memories of trips to Europe in ${possessivePronoun} younger days.`,
+    `Listened to a collection of classical music that ${possessivePronoun} daughter brought on a new portable player. ${capitalPronoun} closed ${possessivePronoun} eyes and conducted along with favorite passages.`,
+    `Worked on ${possessivePronoun} stamp collection, organizing and cataloging new additions. This hobby has been a passion for over fifty years.`,
+    `Tended to the small container garden on ${possessivePronoun} patio. The herbs ${pronoun} grows are often used by the kitchen staff in meal preparation.`,
+    
+    // Animal therapy and nature
+    `Had a visit from a therapy dog that ${pronoun} particularly enjoyed. ${capitalPronoun} mentioned having owned several dogs throughout ${possessivePronoun} life and missed having a pet.`,
+    `Spent time bird watching from the sunroom and identified several species. ${capitalPronoun} keeps a notebook of all the birds ${pronoun} spots throughout the seasons.`,
+    `Interacted with the visiting therapy rabbits and helped groom them. The soft fur and gentle nature of the animals had a visibly calming effect.`,
+    `Watched the sunset from the patio with other residents. ${capitalPronoun} commented on how the beautiful colors reminded ${pronoun} of painting classes ${pronoun} took years ago.`,
+    `Enjoyed time in the sensory garden, touching and smelling the aromatic herbs. This activity always brings back pleasant memories of ${possessivePronoun} childhood home.`
+  ];
+  
+  const medicallyRelevantEvents = [
+    `Mentioned feeling slight dizziness when standing up quickly. ${capitalPronoun} noted this has happened a few times this week but passes quickly.`,
+    `Noted some discomfort in ${possessivePronoun} left knee during the walking activity. ${capitalPronoun} said it feels better when sitting with a small pillow under the knee.`,
+    `Reported sleeping better after changing the evening routine to include reading instead of TV. ${capitalPronoun} has been averaging about seven hours of uninterrupted sleep.`,
+    `Mentioned having a headache in the morning that improved after breakfast. ${capitalPronoun} thinks it might be related to not drinking enough water the previous day.`,
+    `Expressed feeling more energetic after the medication adjustment made last week. ${capitalPronoun} has been participating in more afternoon activities as a result.`,
+    `Reported some confusion about the day of the week during morning check-in. ${capitalPronoun} was oriented after looking at the calendar in ${possessivePronoun} room.`,
+    `Mentioned appetite has improved over the past few days. ${capitalPronoun} has been finishing most meals and enjoying the fruit options at lunch.`,
+    `Noted that ${possessivePronoun} vision seemed a bit blurry while reading. ${capitalPronoun} mentioned it's time to schedule an eye exam as it's been over a year.`,
+    `Reported feeling more stable when using the new walking aid provided by physical therapy. ${capitalPronoun} appreciates the additional support when walking longer distances.`,
+    `Mentioned being more aware of staying hydrated throughout the day. ${capitalPronoun} has been using the water bottle given by ${possessivePronoun} daughter and refilling it regularly.`,
+    `Noticed some mild swelling in ${possessivePronoun} ankles after sitting for a long period. ${capitalPronoun} elevated ${possessivePronoun} feet as recommended by the nurse.`,
+    `Reported that ${possessivePronoun} new glasses have made reading much more comfortable. ${capitalPronoun} can now enjoy books for longer periods without eye strain.`,
+    `Mentioned feeling a bit more short of breath than usual during the morning exercise. ${capitalPronoun} took breaks as needed and recovered quickly.`,
+    `Reported that the new pillow has helped reduce neck pain in the mornings. ${capitalPronoun} is now waking up with less stiffness and greater comfort.`,
+    `Noticed improvement in hand dexterity after consistent participation in the fine motor skill activities. ${capitalPronoun} can now button ${possessivePronoun} shirts with greater ease.`
+  ];
+  
+  // Create weekly themes to make the weekly view more interesting
+  const weeklyThemes = [
+    { 
+      theme: "Music Week", 
+      activities: [
+        `Attended a piano recital by a visiting musician. ${capitalPronoun} was moved to tears by a piece that was played at ${possessivePronoun} wedding.`,
+        `Participated in the rhythm and percussion workshop. ${capitalPronoun} showed natural talent with the drums and enjoyed the lively session.`,
+        `Joined the sing-along session featuring songs from the 1950s. ${capitalPronoun} knew all the lyrics and helped others remember them.`,
+        `Listened to a presentation about the history of jazz music. ${capitalPronoun} shared memories of seeing famous performers in ${possessivePronoun} youth.`
+      ]
+    },
+    { 
+      theme: "Art Appreciation Week", 
+      activities: [
+        `Visited a traveling art exhibition at the local gallery. ${capitalPronoun} particularly enjoyed the impressionist paintings.`,
+        `Participated in an art therapy session using watercolors. The therapist commented on the emotional depth of ${possessivePronoun} painting.`,
+        `Attended a lecture about famous sculptures throughout history. ${capitalPronoun} asked thoughtful questions about the creative process.`,
+        `Helped create a community mural for the activity room. ${possessivePronoun} contribution featured a beautiful landscape from ${possessivePronoun} hometown.`
+      ]
+    },
+    { 
+      theme: "Cultural Heritage Week", 
+      activities: [
+        `Shared family recipes for the community cookbook project. ${capitalPronoun} described how these dishes were passed down through generations.`,
+        `Participated in a traditional dance demonstration. ${capitalPronoun} showed everyone a few steps from dances ${pronoun} learned as a child.`,
+        `Attended a presentation about different cultural celebrations around the world. ${capitalPronoun} was fascinated by the similarities across traditions.`,
+        `Helped prepare a special cultural meal with the kitchen staff. The dishes represented ${possessivePronoun} family heritage and were shared with all residents.`
+      ]
+    },
+    { 
+      theme: "Nature and Gardening Week", 
+      activities: [
+        `Participated in planting flowers in the community garden. ${capitalPronoun} knew exactly how to arrange the plants for optimal growth.`,
+        `Attended a presentation about local wildlife by a park ranger. ${capitalPronoun} shared observations of birds ${pronoun} has seen from ${possessivePronoun} window.`,
+        `Helped create dried flower arrangements for the dining tables. ${possessivePronoun} artistic touch made each arrangement unique.`,
+        `Joined a nature walk around the grounds, identifying various plants and trees. ${capitalPronoun} shared knowledge about medicinal uses of certain plants.`
+      ]
+    }
+  ];
+  
+  const diary = [];
+  const today = new Date();
+  
+  // Create diary entries for each day
+  for (let i = 0; i < days; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    
+    // Determine if this day falls within a themed week (first 28 days divided into 4 themed weeks)
+    let dailyActivities = [];
+    const weekIndex = Math.floor(i / 7) % weeklyThemes.length;
+    const dayInWeek = i % 7;
+    
+    // On certain days of themed weeks, include a themed activity
+    if (i < 28 && dayInWeek < 4) { // First 4 days of each themed week
+      dailyActivities.push(weeklyThemes[weekIndex].activities[dayInWeek]);
+    }
+    
+    // Select 1-2 additional random activities for the day (less than before since we have themed activities)
+    const numActivities = Math.floor(Math.random() * 2) + 1; // 1-2 activities
+    
+    // Create a set to avoid duplicate activity indices
+    const selectedIndices = new Set();
+    
+    for (let j = 0; j < numActivities; j++) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * activities.length);
+      } while (selectedIndices.has(randomIndex));
+      
+      selectedIndices.add(randomIndex);
+      dailyActivities.push(activities[randomIndex]);
+    }
+    
+    // Decide if there should be something medically relevant (20% chance)
+    const hasMedicallyRelevant = Math.random() < 0.2;
+    if (hasMedicallyRelevant) {
+      const randomIndex = Math.floor(Math.random() * medicallyRelevantEvents.length);
+      dailyActivities.push(medicallyRelevantEvents[randomIndex]);
+    }
+    
+    // Create the content by joining the activities
+    const content = dailyActivities.join(' ');
+    
+    diary.push({
+      date: date.toISOString().split('T')[0],
+      content,
+      activities: dailyActivities,
+      medicallyRelevant: hasMedicallyRelevant
+    });
+  }
+  
+  return diary;
+};
+
+// Apply diary entries to all patients
+export const patientsWithDiaries = patients.map(patient => ({
+  ...patient,
+  diaryEntries: generateDiaryEntries(30, patient.gender)
+})); 

@@ -3,6 +3,7 @@ import { Heart, Pill, Mic, Clock, Brain, Activity, AlertTriangle } from 'lucide-
 import LineChart from './LineChart';
 import MetricCard from './MetricCard';
 import AlertItem from './AlertItem';
+import ResidentDiary from './ResidentDiary';
 import { 
   ResponsiveContainer, 
   BarChart as RechartsBarChart,
@@ -37,6 +38,14 @@ interface Resident {
   };
   historicalHealthScores?: number[];
   gender: string;
+  diaryEntries?: DiaryEntry[];
+}
+
+interface DiaryEntry {
+  date: string;
+  content: string;
+  activities: string[];
+  medicallyRelevant?: boolean;
 }
 
 interface Alert {
@@ -135,6 +144,15 @@ const ResidentDetail: React.FC<ResidentDetailProps> = ({ patient, patientAlerts 
           }
         </p>
       </div>
+
+      {/* Resident Diary */}
+      {patient.diaryEntries && patient.diaryEntries.length > 0 && (
+        <ResidentDiary 
+          diaryEntries={patient.diaryEntries} 
+          residentName={patient.name}
+          gender={patient.gender}
+        />
+      )}
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
